@@ -22,7 +22,7 @@ Le applicazioni web rappresentano una risorsa fondamentale per qualunque organiz
 
 ---
 
-## 📄 [Visualizza il PDF della tesi](Tesi_di_laurea_triennale_XSS-senza_dedica_e_ringraziamenti (1).pdf)
+## 📄 [Visualizza il PDF della tesi](Tesi_di_laurea_triennale_XSS-senza_dedica_e_ringraziamenti(1).pdf)
 
 ---
 
