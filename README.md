@@ -13,6 +13,13 @@ Le applicazioni web rappresentano una risorsa fondamentale per qualunque organiz
 
 ---
 
+## 🏷️ Keywords
+- **Web Security**
+- **Python**
+- **Web Application Development**
+- **Secure Coding Practices**
+- **MItigation Techniques**
+
 ## 🔒 Sicurezza e Scopo Didattico
 
 Questo progetto non ha finalità di attacco reale, ma esclusivamente didattiche e dimostrative.
