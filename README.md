@@ -22,6 +22,10 @@ Le applicazioni web rappresentano una risorsa fondamentale per qualunque organiz
 
 ---
 
+## 📄 [Visualizza il PDF della tesi](Tesi_di_laurea_triennale.pdf)
+
+---
+
 ## 🔒 Sicurezza e Scopo Didattico
 
 Questo progetto non ha finalità di attacco reale, ma esclusivamente didattiche e dimostrative.
