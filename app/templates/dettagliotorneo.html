@@ -1,0 +1,456 @@
+{% extends 'layout.html' %}
+
+{% block head %}
+  <title>{{ torneo.nome }} - Sports no Sekai</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='assets/ico/apple-touch-icon.png') }}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='assets/ico/favicon-32x32.png') }}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='assets/ico/favicon-16x16.png') }}">
+  <link rel="manifest" href="{{ url_for('static', filename='assets/ico/site.webmanifest') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='fonts/icomoon/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap/bootstrap.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/jquery-ui.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/owl.carousel.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/owl.theme.default.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/jquery.fancybox.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-datepicker.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='fonts/flaticon/font/flaticon.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/aos.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+{% endblock %}
+
+{% block content %}
+  {% include "frame_navigation_torneo.html" %}
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-messages container mt-2">
+        {% for category, msg in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            {{ msg }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+  {% endwith %}
+
+
+
+  <div class="hero text-center py-5 bg-light mt-custom">
+    <div class="container">
+      <img src="{{ url_for('static', filename='images/' ~ torneo.logo) }}" alt="Logo {{ torneo.nome }}" class="img-fluid mb-4" style="max-height: 400px;">
+      <h1 class="display-4">{{ torneo.nome }}</h1>
+      <p class="lead text-muted">Il torneo migliore al mondo</p>
+    </div>
+  </div>
+
+  {% if ultimo_scontro %}
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="d-flex team-vs">
+            <span class="score">{{ ultimo_scontro.punteggio1 }} - {{ ultimo_scontro.punteggio2 }}</span>
+            <div class="team-1 w-50">
+              <div class="team-details w-100 text-center">
+                <a href="{{ url_for('dettagliosquadra.home', squadra_id=ultimo_scontro.squadra1_id) }}">
+                  <img src="{{ url_for('static', filename='images/' ~ img_squadra1_ultimo) }}" alt="Image" class="img-fluid">
+                  <h3>{{ nomeTeam1_ultimo }}</h3>
+                </a>
+              </div>
+            </div>
+            <div class="team-2 w-50">
+              <div class="team-details w-100 text-center">
+                <a href=#>
+                  <img src="{{ url_for('static', filename='images/' ~ img_squadra2_ultimo) }}" alt="Image" class="img-fluid">
+                  <h3>{{ nomeTeam2_ultimo }}</h3>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% else %}
+    <div class="col-12">
+      <div class="alert alert-info text-center">
+        Al momento non c'è l'ultimo scontro del torneo disponibile.
+      </div>
+    </div>
+  {% endif %}
+
+  <div class="site-section bg-dark">
+    <div class="container">
+      <div class="row">
+        <div class="col-12 title-section">
+          <h2 class="heading">Prossimi scontri</h2>
+        </div>
+        {% set prossimi_scontri = scontri_con_immagini | selectattr('punteggio1', 'equalto', None) | list %}
+        {% if prossimi_scontri %}
+          {% for s in prossimi_scontri %}
+            <div class="col-lg-6 mb-4">
+              <div class="bg-light p-4 rounded">
+                <div class="widget-body">
+                  <div class="widget-vs">
+                    <div class="d-flex align-items-center justify-content-around justify-content-between w-100">
+                      <div class="team-1 text-center">
+                        <a href="{{ url_for('dettagliosquadra.home', squadra_id=s.squadra1_id) }}">
+                          <img src="{{ url_for('static', filename='images/' ~ s.img_squadra1) }}" alt="Logo {{ s.nome_squadra1 }}" class="img-fluid mb-2">
+                          <h3>{{ s.nome_team1 }}</h3>
+                        </a>
+                      </div>
+                      <div>
+                        <span class="vs"><span>VS</span></span>
+                      </div>
+                      <div class="team-2 text-center">
+                        <a href="{{ url_for('dettagliosquadra.home', squadra_id=s.squadra2_id) }}">
+                          <img src="{{ url_for('static', filename='images/' ~ s.img_squadra2) }}" alt="Logo {{ s.nome_squadra2 }}" class="img-fluid mb-2">
+                          <h3>{{ s.nome_team2 }}</h3>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="text-center widget-vs-contents mb-4">
+                  <p class="mb-5">
+                    <span class="d-block">{{ s.data|date_it }}</span>
+                    <span class="d-block">{{ s.orario|time_it }}</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="col-12">
+            <div class="alert alert-info text-center">
+              Al momento non ci sono scontri del torneo disponibili.
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="site-section bg-dark">
+    <div class="container">
+      <div class="row">
+        <div class="col-12 title-section">
+          <h2 class="heading">Scontri disputati</h2>
+        </div>
+        {% set scontri_disputati = scontri_con_immagini | selectattr('punteggio1', 'ne', None) | list %}
+        {% if scontri_disputati %}
+          {% for s in scontri_disputati %}
+            <div class="col-lg-6 mb-4">
+              <div class="bg-light p-4 rounded">
+                <div class="widget-body">
+                  <div class="widget-vs">
+                    <div class="d-flex align-items-center justify-content-around justify-content-between w-100">
+                      <div class="team-1 text-center">
+                        <a href="{{ url_for('dettagliosquadra.home', squadra_id = s.squadra1_id)}}">
+                          <img src="{{ url_for('static', filename='images/' ~ s.img_squadra1) }}" alt="Logo {{ s.nome_squadra1 }}" class="img-fluid mb-2">
+                          <h3>{{ s.nome_team1 }}</h3>
+                        </a>
+                      </div>
+                      <div>
+                        <span class="score" id="score-{{s.id}}">{{ s.punteggio1 }} - {{ s.punteggio2 }}</span>
+                      </div>
+                      <div class="team-2 text-center">
+                        <a href="{{ url_for('dettagliosquadra.home', squadra_id = s.squadra2_id)}}">
+                          <img src="{{ url_for('static', filename='images/' ~ s.img_squadra2) }}" alt="Logo {{ s.nome_squadra2 }}" class="img-fluid mb-2">
+                          <h3>{{ s.nome_team2 }}</h3>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="text-center widget-vs-contents mb-4">
+                  <p class="mb-5">
+                    <span class="d-block">{{ s.data|date_it }}</span>
+                    <span class="d-block">{{ s.orario|time_it }}</span>
+                    {% if s.numero_commenti %}
+                      <span class="comment-count" data-scontro-id="{{ s.id }}" >{{ s.numero_commenti }} commenti</span>
+                      {% else %}
+                      <span class="comment-count" data-scontro-id="{{ s.id }}" > Non sono presenti commenti </span>
+                      {% endif %}
+                  </p>
+                  <button type="button"
+                          class="btn btn-primary btn-open-comments"
+                          data-toggle="modal"
+                          data-target="#ModalCommenti"
+                          data-scontro-id="{{ s.id }}"
+                          data-title="{{ s.nome_team1 }} vs {{ s.nome_team2 }}">
+                          
+                    Visualizza commenti
+                  </button>
+
+                  <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#ModalAggiungiCommento-{{ s.id }}">
+                    Aggiungi commento
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="modal fade" id="ModalAggiungiCommento-{{s.id}}" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="ModalAggiungiCommentoLabel-{{s.id}}" aria-hidden="true">
+              <div class="modal-dialog ">
+                <div class="modal-content bg-dark text-white">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="ModalAggiungiCommentoLabel-{{s.id}}">Aggiungi Commento</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <form   class="ajax-add-comment-form" method="post" action="{{ url_for('aggiungicommento.home', scontro_id=s.id)}}">
+                    <div class="modal-body">
+                    <div class ="form-group">
+                      <label for="nome-{{s.id}}">Nome:</label>
+                      <input type="text" class="form-control" id="nome-{{s.id}}" name="nome" placeholder="Inserisci il tuo nome" required>
+                    </div>
+                    <div class="form-group">
+                      <label for="commento-{{s.id}}">Inserisci il tuo commento:</label>
+                      <textarea class="form-control commento textarea" id="commento-{{s.id}}" name="commento" rows="3" required maxlength="500"></textarea>
+                      <small id="charCount-{{s.id}}" class="form-text text-muted text-right">
+                        0 / 500
+                      </small>
+                    </div>
+                    </div>
+                  
+                  <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Invia</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    
+                  </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="col-12">
+            <div class="alert alert-info text-center">
+              Al momento non ci sono scontri del torneo già disputati.
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+
+        <div class="modal fade" id="ModalCommenti" data-keyboard="false" tabindex="-1" aria-labelledby="ModalCommentiLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-scrollable">
+            <div class="modal-content bg-dark text-white">
+              <div class="modal-header">
+                <h5 class="modal-title" id="ModalCommentiLabel">Commenti</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+               
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+      
+
+{% endblock %}
+
+{% block scripts %}
+  <script src="{{ url_for('static', filename='js/jquery-3.3.1.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery-migrate-3.0.1.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery-ui.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/owl.carousel.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery.stellar.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery.countdown.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/bootstrap-datepicker.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery.easing.1.3.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/aos.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery.fancybox.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery.sticky.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery.mb.YTPlayer.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+  <script nonce="{{ csp_nonce }}">
+    $(function(){
+      console.log('[debug] commenti.js loaded');
+
+      const PER_PAGE = 5;
+      var COMMENTS_STATE = {}; 
+
+      $('#ModalCommenti').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);
+        var scontroId = button.data('scontro-id');
+        var title = button.data('title') || 'Commenti';
+        var modal = $(this);
+        var body = modal.find('.modal-body').empty();
+
+        modal.find('.modal-title').text(title);
+
+        if (!scontroId) {
+          body.append('<div class="alert alert-info text-center">Nessun ID scontro fornito. Impossibile caricare i commenti.</div>');
+          return;
+        }
+
+        COMMENTS_STATE[scontroId] = { page: 1, per_page: PER_PAGE, loading: false, end: false };
+
+        var list = $('<div>').addClass('comment-list').attr('data-scontro-id', scontroId);
+        var loadMoreRow = $('<div class="text-center mt-3"></div>');
+        var loadMoreBtn = $('<button class="btn btn-sm btn-outline-primary">Carica altri</button>');
+        var spinner = $('<div class="spinner-border spinner-border-sm ml-2" role="status" style="display:none;"><span class="sr-only">Loading...</span></div>');
+        loadMoreRow.append(loadMoreBtn).append(spinner);
+        body.append(list).append(loadMoreRow);
+
+        function loadPage() {
+          var st = COMMENTS_STATE[scontroId];
+          if (!st || st.loading || st.end) return;
+          st.loading = true;
+          spinner.show();
+          loadMoreBtn.prop('disabled', true);
+
+          var url = '/api/commenti/' + encodeURIComponent(scontroId) + '?page=' + encodeURIComponent(st.page) + '&per_page=' + encodeURIComponent(st.per_page);
+          $.getJSON(url)
+            .done(function(res){
+              if (!res || !res.ok) {
+                body.append('<div class="alert alert-danger">Errore caricamento commenti.</div>');
+                st.end = true;
+                return;
+              }
+              var items = res.items || [];
+              if (items.length === 0 && st.page === 1) {
+                list.append('<div class="alert alert-info text-center">Non ci sono commenti per questo scontro.</div>');
+                st.end = true;
+                loadMoreRow.hide();
+                return;
+              }
+              items.forEach(function(c){
+                list.append(renderComment(c, scontroId));
+              });
+              var loaded = (st.page) * st.per_page;
+              if (loaded >= (res.total || 0)) {
+                st.end = true;
+                loadMoreRow.hide();
+              } else {
+                st.page += 1;
+                loadMoreBtn.prop('disabled', false);
+              }
+            })
+            .fail(function(){
+              body.append('<div class="alert alert-danger">Errore di rete durante il caricamento.</div>');
+            })
+            .always(function(){
+              st.loading = false;
+              spinner.hide();
+            });
+        }
+
+        loadPage();
+
+        loadMoreBtn.off('click').on('click', function(){
+          loadPage();
+        });
+      });
+
+      $('#ModalCommenti').on('hidden.bs.modal', function(){
+        var modal = $(this);
+        modal.find('.modal-body').empty();
+      });
+    });
+
+    function updateCommentCount(scontroId, change) {
+      var counterElement = $('.comment-count[data-scontro-id="' + scontroId + '"]');
+      if (counterElement.length > 0) {
+        var currentText = counterElement.html();
+        var currentCount;
+        if (currentText.includes('Non sono presenti')) {
+          currentCount = 0;
+        } else {
+          currentCount = parseInt(currentText.match(/\d+/), 10) || 0;
+        }
+        var newCount = currentCount + change;
+
+        var newText;
+        if (newCount <= 0) {
+          newText = 'Non sono presenti commenti';
+        } else if (newCount === 1) {
+          newText = '1 commento';
+        } else {
+          newText = newCount + ' commenti';
+        }
+        counterElement.text(newText);
+      }
+    }
+
+function decodeEntities(encodedStr) {
+  var txt = document.createElement('textarea');
+  txt.innerHTML = encodedStr;
+  return txt.value;
+}
+
+    
+function renderComment(c, scontroId) {
+  var div = $('<div class="comment mb-3 p-2 border-bottom d-flex align-items-start">');
+  var contentDiv = $('<div class="comment-body flex-grow-1">');
+  var header = $('<div class="comment-header font-weight-bold">').text((c.nome || 'Anonimo') + ' - ' + (c.created_at || ''));
+
+  var raw = (c.contenuto || '').replace(/\r\n/g, '\n');
+
+  var contentWrapper = $('<div>').html(raw); 
+
+
+  contentDiv.append(header).append(contentWrapper);
+  div.append(contentDiv);
+  return div;
+}
+
+
+   
+$(function(){
+  function aggiornaContatore($textarea){
+    var id = $textarea.attr('id'); 
+    if(!id) return;
+    var parts = id.split('-');
+    var sId = parts[parts.length - 1];
+    var $counter = $('#charCount-' + sId);
+    if(!$counter.length) return;
+
+    var val = $textarea.val() || '';
+    
+    if(val.length > 500){
+      val = val.substring(0, 500);
+      $textarea.val(val);
+    }
+    $counter.html(val.length + ' / 500');
+  }
+
+  $('textarea[id^="commento-"]').each(function(){
+    aggiornaContatore($(this));
+  });
+
+  $(document).on('input', 'textarea[id^="commento-"]', function(){
+    aggiornaContatore($(this));
+  });
+
+  $('#ModalCommenti, .modal').on('shown.bs.modal', function(e){
+    
+    $(this).find('textarea[id^="commento-"]').each(function(){
+      aggiornaContatore($(this));
+    });
+  });
+
+
+  $(document).on('focus', 'textarea[id^="commento-"]', function(){
+    aggiornaContatore($(this));
+  });
+});
+
+  </script>
+
+{% endblock %}

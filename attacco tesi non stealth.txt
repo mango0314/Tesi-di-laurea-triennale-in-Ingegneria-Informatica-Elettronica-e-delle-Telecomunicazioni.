@@ -1,0 +1,50 @@
+Esatto, per renderlo realistico puoi simulare il comportamento di un attaccante “curioso” che:
+
+1. **Ispeziona la pagina** con DevTools (o “Visualizza sorgente”).
+2. Individua dove viene renderizzato il punteggio, ad esempio:
+
+   ```html
+   <span class="score">2 - 1</span>
+   ```
+3. Capisce che questo elemento non ha un ID univoco, ma ha una classe (`score`), e che modificandolo con JS il risultato a schermo cambierebbe.
+
+Nel tuo caso, il payload XSS per la demo potrebbe essere molto diretto, ad esempio:
+
+```html
+<script>
+document.querySelector('.score').textContent = '5 - 0';
+</script>
+```
+
+Questo è un XSS “riflessivo/stored” (nel tuo caso stored), perché:
+
+* Il codice è salvato nel DB come commento.
+* Viene richiamato quando un utente apre la modale commenti.
+* `.html(c.contenuto)` **interpreta** il nostro `<script>`.
+
+---
+
+📌 Per renderlo ancora più “realistico”:
+
+* Usa un **singolo commento** per attaccare **un solo scontro**.
+* Inietta nel payload una query più mirata, usando attributi che trovi nella pagina (es. `data-scontro-id`).
+
+Esempio più realistico:
+
+```html
+<script>
+document.querySelector(
+  '.comment-count[data-scontro-id="42"]'
+).closest('.bg-light').querySelector('.score').textContent = '5 - 0';
+</script>
+```
+
+Qui:
+
+* L’attaccante ha prima visto che ogni blocco scontro ha un `data-scontro-id` associato.
+* Ha creato un payload che va a trovare *solo* il punteggio dello scontro con ID 42.
+
+---
+
+Se vuoi, nel prossimo passo ti posso preparare **la versione “stealth”** che non mostra direttamente il `<script>` nel commento (ad esempio usando `onerror` su un’immagine invisibile) così da sembrare innocua.
+Vuoi che procediamo in quella direzione?

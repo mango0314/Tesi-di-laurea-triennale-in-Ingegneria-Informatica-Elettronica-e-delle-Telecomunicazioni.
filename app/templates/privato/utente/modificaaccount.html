@@ -1,0 +1,144 @@
+{% extends "layout.html" %}
+
+{% block head %}
+  <title>Modifica Account - Sports no Sekai</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='assets/ico/apple-touch-icon.png') }}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='assets/ico/favicon-32x32.png') }}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='assets/ico/favicon-16x16.png') }}">
+  <link rel="manifest" href="{{ url_for('static', filename='assets/ico/site.webmanifest') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='fonts/icomoon/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap/bootstrap.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/jquery-ui.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/owl.carousel.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/owl.theme.default.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/jquery.fancybox.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-datepicker.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='fonts/flaticon/font/flaticon.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/aos.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+{% endblock %}
+
+{% block content %}
+  {% if errori %}
+    <div class="alert alert-danger">
+      <ul>
+        {% for messaggio in errori %}
+          <li>{{ messaggio }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  <div class="logo-header text-center py-4">
+    <a href="{{ url_for('index.home') }}">
+      <img src="{{ url_for('static', filename='images/Sports no Sekai logo no sfondo.png') }}" alt="Sports no Sekai" class="logo img-fluid" />
+    </a>
+  </div>
+
+  <section class="login-hero d-flex align-items-center justify-content-center">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-lg-7">
+          <h1 class="text-center mb-4 text-white">Modifica account</h1>
+          <h5 class="text-left mb-4 text-white">Dati di accesso</h5>
+          <form id="contactForm" method="post" action="{{ url_for('modificaaccount.home')}}">
+            <div class="form-floating mb-3">
+              <input class="form-control bg-dark text-white" id="username" name="username" type="text" placeholder="Username" value="{{account.username}}" readonly  />
+              
+            </div>
+            <div class="form-floating mb-3">
+              <input class="form-control" id="password" name="vpassword" type="password" placeholder="Vecchia Password" required minlength="8" pattern="^(?=.*[!@#$%^&*]).{8,}$" title="Minimo 8 caratteri e almeno un carattere speciale (!@#$%^&*)" />
+              <div class="invalid-feedback">La password deve avere almeno 8 caratteri e contenere un carattere speciale (!@#$%^&*).</div>
+              <input class="form-control" id="password" name="npassword" type="password" placeholder="Nuova Password" required minlength="8" pattern="^(?=.*[!@#$%^&*]).{8,}$" title="Minimo 8 caratteri e almeno un carattere speciale (!@#$%^&*)" />
+              <div class="invalid-feedback">La password deve avere almeno 8 caratteri e contenere un carattere speciale (!@#$%^&*).</div>
+            </div>
+            <h5 class="text-left mb-4 text-white">Dati squadra</h5>
+            <div class="form-floating mb-3">
+              <input type="hidden" name="squadra_id" value="{{ squadra.id }}" />
+              <input type="hidden" name="torneo_id" value="{{ squadra.torneo_id }}" />
+              <input class="form-control" id="nome" name="nomesquadra" type="text" value="{{squadra.nome if squadra else ''}}" placeholder="Nome squadra" required />
+              <div class="invalid-feedback">Nome squadra is required.</div>
+              
+            </div>
+            <div class="row">
+            {% for logo in ['logo_1.png','logo_2.png','logo_3.png','logo_4.png','logo_5.png','logo_6.png','logo_7.png','logo_8.png'] %}
+            <div class="col-6 col-md-4 col-lg-3 logo-option mb-3">
+              <input type="radio"
+                     id="{{ logo }}"
+                     name="team_logo"
+                     value="{{ logo }}"
+                     {% if squadra.logo == logo %}checked{% endif %}
+                     required>
+              <label for="{{ logo }}" class="card p-2 text-center">
+                <img src="{{ url_for('static', filename='images/' ~ logo) }}" class="img-fluid" alt="Logo {{ loop.index }}">
+                <div class="mt-2">Logo {{ loop.index }}</div>
+              </label>
+            </div>
+            {% endfor %}
+          </div>
+            <button class="btn btn-primary btn-xl w-100" id="submitButton" type="submit">Modifica</button>
+          </form>
+          <br><br><br>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{{ url_for('static', filename='js/jquery-3.3.1.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery-migrate-3.0.1.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery-ui.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/owl.carousel.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery.stellar.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery.countdown.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/bootstrap-datepicker.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery.easing.1.3.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/aos.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery.fancybox.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery.sticky.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery.mb.YTPlayer.min.js') }}"></script>
+  <script>
+  </script>
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script>
+  const selects = Array.from(document.querySelectorAll('.jersey-select'));
+
+  function aggiornaOpzioni() {
+   
+    const scelte = selects
+      .map(sel => sel.value)
+      .filter(v => v !== "");
+
+    selects.forEach(sel => {
+      const corrente = sel.value; 
+
+     
+      sel.querySelectorAll('option').forEach(opt => {
+        if (opt.value === "") {
+        
+          opt.disabled = false;
+        } else if (opt.value === corrente) {
+          
+          opt.disabled = false;
+        } else if (scelte.includes(opt.value)) {
+          opt.disabled = true;
+        } else {
+          opt.disabled = false;
+        }
+      });
+    });
+  }
+
+  selects.forEach(sel => {
+    sel.addEventListener('change', aggiornaOpzioni);
+  });
+
+  aggiornaOpzioni();
+</script>
+{% endblock %}

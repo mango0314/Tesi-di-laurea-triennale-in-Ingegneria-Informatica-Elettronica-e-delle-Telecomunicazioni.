@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="it">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="csrf-token" content="{{ csrf_token_value }}">
+
+    {% block head %}
+    <!-- blocco override per titoli, meta, CSS specifici -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% endblock %}
+</head>
+<body>
+    {% if not manual%}
+      {% if ruolo == 0 %}
+        {% include 'privato/admin/frame_navigation_admin.html'%}
+      {% elif ruolo == 1 %}
+        {% include 'privato/utente/frame_navigation_utente.html' %}
+      {% elif not hide_navigation %}
+        {% include "frame_navigation.html" %}
+      {% endif %}
+    {% endif %}
+
+    <main>
+      {% block content %}
+      {% endblock %}
+    </main>
+
+    {% if not manual%}
+
+      {% if ruolo == 0 or ruolo == 1%}
+        {% include "privato/foot.html"%}
+    
+      {% elif not hide_navigation%}
+        {% include "foot.html" %}
+      {% endif %}
+    {% endif %}
+
+    {% block scripts %}
+<script nonce="{{ csp_nonce }}">
+(function(){
+  const meta = document.querySelector('meta[name="csrf-token"]');
+  if(!meta) return;
+  const token = meta.getAttribute('content') || '';
+
+  document.addEventListener('DOMContentLoaded', function(){
+    document.querySelectorAll('form').forEach(function(form){
+      const method = (form.method || '').toLowerCase();
+      if(method === 'post' && !form.querySelector('input[name=\"csrf_token\"]')){
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'csrf_token';
+        input.value = token;
+        form.appendChild(input);
+      }
+    });
+  });
+
+  const _fetch = window.fetch;
+  window.fetch = function(input, init){
+    init = init || {};
+    // garantisce invio cookie di sessione su richieste same-origin
+    init.credentials = init.credentials || 'same-origin';
+
+    // usa Headers per gestire correttamente diverse forme di init.headers
+    init.headers = new Headers(init.headers || {});
+    const hasHeader = init.headers.has('X-CSRFToken') || init.headers.has('X-CSRF-Token') || init.headers.has('x-csrftoken') || init.headers.has('x-csrf-token');
+
+    const method = (init.method || 'GET').toUpperCase();
+    if((method === 'POST' || method === 'PUT' || method === 'DELETE') && !hasHeader){
+      init.headers.set('X-CSRFToken', token);
+    }
+    return _fetch(input, init);
+  };
+})();
+</script>
+
+        
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  {% endblock %}
+</body>
+</html>

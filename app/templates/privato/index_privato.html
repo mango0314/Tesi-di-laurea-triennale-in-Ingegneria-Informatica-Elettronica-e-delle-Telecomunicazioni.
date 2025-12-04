@@ -1,0 +1,179 @@
+{% extends 'layout.html' %}
+
+{% block head %}
+  <title>{% if ruolo == 0 %}Admin{% else %}{{ squadra.nome }}{% endif %} - Sports no Sekai</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='assets/ico/apple-touch-icon.png') }}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='assets/ico/favicon-32x32.png') }}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='assets/ico/favicon-16x16.png') }}">
+  <link rel="manifest" href="{{ url_for('static', filename='assets/ico/site.webmanifest') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='fonts/icomoon/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap/bootstrap.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/jquery-ui.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/owl.carousel.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/owl.theme.default.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/jquery.fancybox.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-datepicker.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='fonts/flaticon/font/flaticon.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/aos.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+{% endblock %}
+
+
+
+{% block content %}
+  {% if ruolo == 0 %}
+    
+
+    <div class="hero overlay" style="background-image: url('{{ url_for('static', filename='images/admin sfondo.png') }}');">
+      <div class="container">
+        <div class="row align-items-center">
+          <div class="col-lg-5 mx-auto text-center">
+            <h1 class="text-white">Admin</h1>
+            <p>Cosa cambiamo oggi?</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="site-section bg-dark">
+      <div class="container">
+        <div class="row">
+          <div class="col-12 title-section">
+            <h2 class="heading d-inline-flex align-items-center">
+              Tornei disponibili
+              <a href="{{ url_for('richiediaggiungitorneo.home')}}" class="btn btn-primary btn-sm ml-3" title="Aggiungi Torneo">
+                <i class="bi bi-plus"></i>
+              </a>
+            </h2>
+          </div>
+          {% if lista_tuttitornei and lista_tuttitornei|length > 0 %}
+            {% for t in lista_tuttitornei %}
+              <div class="col-lg-6 mb-4">
+                <div class="bg-light p-2 rounded">
+                  <div class="widget-body">
+                    <div class="widget-vs">
+                      <div class="d-flex align-items-center justify-content-around justify-content-between w-100">
+                        <div class="team-1 text-center">
+                          <a href="{{ url_for('dettagliotorneo_admin.home', torneo_id=t.id, sportid=t.sport_id ) }}">
+                            <img src="{{ url_for('static', filename='images/' ~ t.logo) }}" alt="Logo {{ t.nome }}" class="img-fluid mb-2">
+                            <div class="team-2 text-center">
+                          <h3>{{ t.nome }}</h3>
+                        </div>
+                          </a>
+                          <a href ="{{ url_for('richiedimodificatorneo.home', torneo_id = t.id)}}" <button class="btn btn-primary btn-sm mt-2">Modifica</button></a> 
+                          <a href="{{ url_for('eliminatorneo.home', torneo_id = t.id)}}" <button class="btn btn-primary btn-sm mt-2">Elimina</button></a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          {% else %}
+            <div class="col-12">
+              <div class="alert alert-info text-center">
+                Al momento non ci sono tornei disponibili.
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  {% else %}
+    <div class="hero text-center py-5 bg-light mt-custom">
+      <div class="container">
+        <img src="{{ url_for('static', filename='images/' ~ squadra.logo) }}" alt="Logo {{ squadra.nome }}" class="img-fluid mb-4" style="max-height: 400px;">
+        <h1 class="display-4">{{ squadra.nome }}</h1>
+        {% if username %}
+          <p>Bentornato, {{ username }}!</p>
+        {% else %}
+          <p>Utente non riconosciuto.</p>
+        {% endif %}
+        <br>
+        <a href="{{ url_for('richiedimodificaaccount.home')}}" class="btn btn-primary btn-sm">MODIFICA</a>
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+        ELIMINA
+        </button>
+      </div>
+    </div>
+    <div class="site-section bg-dark">
+      <div class="container">
+        <div class="row">
+          <div class="col-12 title-section">
+            <h2 class="heading">Giocatori</h2>
+          </div>
+          <div class="col-12">
+            {% if giocatori and giocatori|length > 0 %}
+              <table class="table custom-table">
+                <thead>
+                  <tr>
+                    <th>Nome</th>
+                    <th>Cognome</th>
+                    <th>Data di Nascita</th>
+                    <th>Numero di Maglia</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for g in giocatori %}
+                    <tr>
+                      <td>{{ g.nome }}</td>
+                      <td>{{ g.cognome }}</td>
+                      <td>{{ g.data_di_nascita|date_it }}</td>
+                      <td>{{ g.numero_di_maglia }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            {% else %}
+              <div class="alert alert-info text-center">
+                Al momento non ci sono giocatori nella squadra selezionata.
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>     
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content bg-dark text-white">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel" >Elimina Account</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body dark">
+            Sei sicuro di voler eliminare il tuo account?
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Chiudi</button>
+            <a href= "{{ url_for('eliminaaccount.home')}}"><button type="button" class="btn btn-primary">Conferma</button></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+{% endblock %}
+
+{% block scripts %}
+  <script src="{{ url_for('static', filename='js/jquery-3.3.1.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery-migrate-3.0.1.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery-ui.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/owl.carousel.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery.stellar.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery.countdown.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/bootstrap-datepicker.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery.easing.1.3.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/aos.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery.fancybox.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery.sticky.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery.mb.YTPlayer.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,159 @@
+{% extends 'layout.html' %}
+
+{% block head %}
+  {{ super() }}
+  <title>
+    {% if scontro %}
+      Modifica Scontro
+    {% else %}
+      Aggiungi Scontro
+    {% endif %}
+  </title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='assets/ico/apple-touch-icon.png') }}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='assets/ico/favicon-32x32.png') }}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='assets/ico/favicon-16x16.png') }}">
+  <link rel="manifest" href="{{ url_for('static', filename='assets/ico/site.webmanifest') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='fonts/icomoon/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap/bootstrap.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/jquery-ui.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/owl.carousel.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/owl.theme.default.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/jquery.fancybox.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-datepicker.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='fonts/flaticon/font/flaticon.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/aos.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+{% endblock %}
+
+{% block content %}
+  {% if errori %}
+    <div class="alert alert-danger">
+      <ul>
+        {% for msg in errori %}
+          <li>{{ msg }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  <div class="logo-header text-center py-4">
+    <a href="{{ url_for('index.home') }}">
+      <img src="{{ url_for('static', filename='images/Sports no Sekai logo no sfondo.png') }}"
+           alt="Sports no Sekai" class="logo img-fluid" />
+    </a>
+  </div>
+
+  <section class="login-hero d-flex align-items-center justify-content-center">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-12 col-sm-10 col-md-8 col-lg-6">
+
+          <h1 class="text-center mb-4 text-white">Gestione Scontro</h1>
+
+          <form id="contactForm"
+                method="post"
+                action="{{ url_for(scontro and 'modificascontro.home' or 'aggiungiscontro.home') }}">
+
+            {% if scontro %}
+              <input type="hidden" name="scontro_id" value="{{ scontro.id }}">
+            {% endif %}
+
+            <div class="form-floating mb-3">
+              <select class="custom-select" id="squadra1id" name="squadra1id" required>
+                <option value="" disabled {% if not scontro %}selected{% endif %}>Seleziona squadra in casa</option>
+                {% for sq in lista_squadretorneo %}
+                  <option value="{{ sq.id }}" {% if scontro and scontro.squadra1_id == sq.id %}selected{% endif %}>
+                    {{ sq.nome }}
+                  </option>
+                {% endfor %}
+              </select>
+              <label for="squadra1id">Squadra 1</label>
+            </div>
+
+            <div class="form-floating mb-3">
+              <select class="custom-select" id="squadra2id" name="squadra2id" required>
+                <option value="" disabled {% if not scontro %}selected{% endif %}>Seleziona squadra in trasferta</option>
+                {% for sq in lista_squadretorneo %}
+                  <option value="{{ sq.id }}" {% if scontro and scontro.squadra2_id == sq.id %}selected{% endif %}>
+                    {{ sq.nome }}
+                  </option>
+                {% endfor %}
+              </select>
+              <label for="squadra2id">Squadra 2</label>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col">
+                <label for="punteggio1" class="form-label">Punteggio 1</label>
+                <input type="number" id="punteggio1" name="punteggio1"
+                       class="form-control" min="0" step="1" {{ sportId==3 and 'max="3"' or '' }}
+                       value="{{ scontro.punteggio1 if scontro else '' }}">
+              </div>
+              <div class="col">
+                <label for="punteggio2" class="form-label">Punteggio 2</label>
+                <input type="number" id="punteggio2" name="punteggio2"
+                       class="form-control" min="0" step="1" {{ sportId==3 and 'max="3"' or '' }}
+                       value="{{ scontro.punteggio2 if scontro else '' }}">
+              </div>
+            </div>
+
+            <div class="form-group mb-3">
+              <label for="data">Data Scontro</label>
+              <input type="date" id="data" name="data" class="form-control"
+                     value="{{ scontro.data if scontro and scontro.data else '' }}">
+            </div>
+
+            <div class="form-group mb-4">
+              <label for="orario">Orario</label>
+              <input type="time" id="orario" name="orario" class="form-control" required
+                     value="{{ scontro.orario|time_it if scontro and scontro.orario else '' }}">
+            </div>
+
+            <button class="btn btn-primary btn-lg w-100" type="submit">Invia</button>
+          </form>
+
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}
+
+{% block scripts %}
+  {{ super() }}
+  <!-- Scripts originali da mantenere -->
+  <script src="{{ url_for('static', filename='js/jquery-3.3.1.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery-migrate-3.0.1.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery-ui.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/owl.carousel.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery.stellar.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery.countdown.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/bootstrap-datepicker.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery.easing.1.3.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/aos.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery.fancybox.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery.sticky.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery.mb.YTPlayer.min.js') }}"></script>
+  <script>
+    function selezionaVoce(testo) {
+      document.getElementById('dropdownBtn').innerText = testo;
+    }
+  </script>
+  <script>
+    $(function() {
+      $('#orario').timepicker({
+        timeFormat: 'HH:mm',
+        interval: 15,
+        dynamic: false,
+        dropdown: true,
+        scrollbar: true,
+        showMinutes: true,
+        showSeconds: false
+      });
+    });
+  </script>
+{% endblock %}

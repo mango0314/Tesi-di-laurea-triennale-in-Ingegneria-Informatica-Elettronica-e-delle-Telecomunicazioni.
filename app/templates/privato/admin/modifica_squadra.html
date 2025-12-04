@@ -1,0 +1,179 @@
+{% extends 'layout.html' %}
+
+{% block head %}
+  <title>Modifica {{ squadra.nome }} - Sports no Sekai</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='assets/ico/apple-touch-icon.png') }}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='assets/ico/favicon-32x32.png') }}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='assets/ico/favicon-16x16.png') }}">
+  <link rel="manifest" href="{{ url_for('static', filename='assets/ico/site.webmanifest') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='fonts/icomoon/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap/bootstrap.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/jquery-ui.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/owl.carousel.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/owl.theme.default.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/jquery.fancybox.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-datepicker.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='fonts/flaticon/font/flaticon.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/aos.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+{% endblock %}
+
+{% block content %}
+
+{% if errori %}
+    <div class="alert alert-danger">
+      <ul>
+        {% for msg in errori %}
+          <li>{{ msg }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+<div class="logo-header text-center py-4">
+  <a href="/">
+    <img src="{{ url_for('static', filename='images/Sports no Sekai logo no sfondo.png') }}" alt="Sports no Sekai" class="logo img-fluid" />
+  </a>
+</div>
+
+
+
+<section class="login-hero d-flex align-items-center justify-content-center">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+
+        <h1 class="text-center mb-4 text-white">Gestione Squadra</h1>
+
+        <form id="modificaSquadraForm" method="post" action="{{ url_for('modificasquadra.home') }}">
+
+          <input type="hidden" name="giocatori_count" value="{{ lista_giocatorisquadra|length if lista_giocatorisquadra else 0 }}"/>
+          <input type="hidden" name="squadra_id" value="{{ squadra.id }}" />
+
+          <div class="form-floating mb-3">
+            <input class="form-control" id="nomeSquadra" name="nome_squadra" type="text"
+                   value="{{ squadra.nome if squadra else '' }}" placeholder="Nome squadra" required />
+            <label for="nomeSquadra">Nome squadra</label>
+            <div class="invalid-feedback" data-sb-feedback="nome_squadra:required">
+              Il nome della squadra è richiesto.
+            </div>
+          </div>
+
+          <div class="row">
+            {% for logo in ['logo_1.png','logo_2.png','logo_3.png','logo_4.png','logo_5.png','logo_6.png','logo_7.png','logo_8.png'] %}
+            <div class="col-6 col-md-4 col-lg-3 logo-option mb-3">
+              <input type="radio"
+                     id="{{ logo }}"
+                     name="team_logo"
+                     value="{{ logo }}"
+                     {% if squadra.logo == logo %}checked{% endif %}
+                     required>
+              <label for="{{ logo }}" class="card p-2 text-center">
+                <img src="{{ url_for('static', filename='images/' ~ logo) }}" class="img-fluid" alt="Logo {{ loop.index }}">
+                <div class="mt-2">Logo {{ loop.index }}</div>
+              </label>
+            </div>
+            {% endfor %}
+          </div>
+
+          {% if lista_giocatorisquadra and lista_giocatorisquadra|length > 0 %}
+          <div class="container py-4">
+            <h5 class="mb-4 text-white"><strong>Componenti squadra</strong></h5>
+            <table class="table table-striped table-bordered">
+              <thead class="thead-dark">
+                <tr>
+                  <th>#</th>
+                  <th class="d-none">ID</th>
+                  <th>Nome</th>
+                  <th>Cognome</th>
+                  <th>Data di nascita</th>
+                  <th>Numero di maglia</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for g in lista_giocatorisquadra %}
+                <tr>
+                  <th scope="row" class="text-white">{{ loop.index }}</th>
+                  <td class="d-none">
+                    <input type="hidden" name="id_{{ loop.index0 }}" value="{{ g.id }}" />
+                  </td>
+                  <td>
+                    <input type="text" name="nome_{{ loop.index0 }}" value="{{ g.nome }}"
+                           class="form-control form-control-sm"
+                           pattern="[A-Za-zÀ-ÿ\s']+"
+                           title="Il nome non può contenere numeri o simboli speciali"
+                           required>
+                  </td>
+                  <td>
+                    <input type="text" name="cognome_{{ loop.index0 }}" value="{{ g.cognome }}"
+                           class="form-control form-control-sm"
+                           pattern="[A-Za-zÀ-ÿ\s']+"
+                           title="Il cognome non può contenere numeri o simboli speciali"
+                           required>
+                  </td>
+                  <td>
+                    <input type="date" name="data_nascita_{{ loop.index0 }}"
+                           value="{{ g.data_di_nascita }}"
+                           class="form-control form-control-sm data-nascita"
+                           placeholder="gg/mm/aaaa"
+                           pattern="\d{2}/\d{2}/\d{4}"
+                           title="Formato richiesto: gg/mm/aaaa"
+                           required>
+                    <div class="invalid-feedback age-feedback" style="display:none;">
+                      Età non valida: devi avere tra 18 e 60 anni.
+                    </div>
+                  </td>
+                  <td>
+                    <select name="numero_maglia_{{ loop.index0 }}" class="form-select form-select-sm jersey-select" required>
+                      <option value="" disabled {% if not g.numero_di_maglia %}selected{% endif %}>— Seleziona —</option>
+                      {% for n in range(1,100) %}
+                      <option value="{{ n }}" {% if g.numero_di_maglia == n %}selected{% endif %}>{{ n }}</option>
+                      {% endfor %}
+                    </select>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% endif %}
+
+          <button class="btn btn-primary btn-xl w-100" type="submit">Modifica</button>
+
+        </form>
+
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{{ url_for('static', filename='js/jquery-3.3.1.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery-migrate-3.0.1.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery-ui.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/owl.carousel.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery.stellar.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery.countdown.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/bootstrap-datepicker.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery.easing.1.3.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/aos.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery.fancybox.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery.sticky.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery.mb.YTPlayer.min.js') }}"></script>
+  <script>
+    
+    // Logica jersey-select disabilitazioni
+    const selects = Array.from(document.querySelectorAll('.jersey-select'));
+    function aggiornaOpzioni() {
+      const scelte = selects.map(s=>s.value).filter(v=>v);
+      selects.forEach(sel => sel.querySelectorAll('option').forEach(opt => opt.disabled = opt.value && opt.value!=sel.value && scelte.includes(opt.value)));
+    }
+    selects.forEach(s=>s.addEventListener('change', aggiornaOpzioni)); aggiornaOpzioni();
+  </script>
+{% endblock %}

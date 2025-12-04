@@ -1,0 +1,85 @@
+Capisco perfettamente cosa vuoi dimostrare, ma devo mettere un limite: non posso fornirti istruzioni passo-passo o payload eseguibili per costruire ed eseguire un attacco. Posso però spiegarti in modo **alto-livello e didattico** come ragiona un attaccante e come impostare una **demo sicura** e difensiva per la tesi.
+
+# Come ragiona (davvero) un attaccante XSS — modello mentale
+
+1. **Ricognizione dell’interfaccia**
+
+   * Guarda **sorgente e DOM dal vivo** (DevTools), mappa dove l’input utente ricompare a schermo: commenti, profili, banner, parametri di query, ecc.
+   * Annota **contesti**: testo in un nodo HTML, attributi, URL, CSS, dentro `<script>`, ecc. Il contesto determina il tipo di iniezione che *potrebbe* funzionare.
+
+2. **Individuazione dei “sink”**
+
+   * Cerca punti in cui il codice client inserisce HTML dinamico (p.es. funzioni che iniettano *HTML* anziché testo) o dove il server rende variabili **senza escaping**.
+   * Nota la presenza di **modali, liste, componenti riusati**: un singolo “sink” spesso influenza più viste.
+
+3. **Test non distruttivi**
+
+   * Prova **marker innocui** per capire se l’input passa intatto (es. stringhe con caratteri speciali) e per identificare **filtri/sanitizzazioni** (cosa viene rimosso? cosa resta?).
+   * Verifica se l’input viene **persistito** (stored) o solo riflesso; verifica quando e come viene **rieseguito** (apertura modale, cambio pagina, scroll, ecc.).
+
+4. **Profilazione del contesto**
+
+   * In ambito HTML, attributo, URL, JS inline, le tecniche cambiano: l’attaccante adatta il “pezzo di input” al **contesto specifico**.
+   * Controlla se ci sono **CSP** (Content Security Policy) e che direttive usa; valuta se esiste `nonce` o `strict-dynamic`.
+
+5. **Trigger dell’esecuzione**
+
+   * Capisce **quando** il markup viene interpretato (al caricamento pagina, all’apertura della modale, al click, all’hover…).
+   * Se la pagina carica contenuti via API, osserva **il flusso AJAX** e dove il risultato viene appeso nel DOM.
+
+6. **Impatto e dimostrazione**
+
+   * Definisce l’obiettivo **visivo** (manipolare un elemento del DOM) e, in un contesto reale, **dati/credenziali** (furto di sessione, CSRF chaining, ecc. — nella tua tesi basta l’effetto visivo).
+   * Documenta il *prima/dopo* con screenshot o brevi clip.
+
+7. **OPSEC e pulizia**
+
+   * In ambienti reali, un attaccante evita tracce e ripulirebbe i contenuti; nella tua demo didattica basta mostrare **come prevenirlo**.
+
+# Come impostare la tua demo (in sicurezza) senza codice offensivo
+
+**Obiettivo:** mostrare che un input non sanificato, reinserito come HTML in una modale, può alterare un elemento `.score` nella card dello scontro.
+
+1. **Allestisci un ambiente di test isolato**
+
+   * Database e applicazione **non esposti** pubblicamente.
+   * Account e dati fittizi.
+
+2. **Crea il percorso narrativo**
+
+   * Slide 1: “Dove rientra l’input utente” → evidenzia il campo “commento” e la lista commenti nella modale.
+   * Slide 2: “Dove finisce nel DOM” → mostra (screenshot DevTools) che la risposta dell’API viene inserita come **HTML** in un contenitore nella modale.
+   * Slide 3: “Quando avviene l’interpretazione” → evidenzia l’evento d’apertura della modale.
+
+3. **Esegui test innocui di “eco”**
+
+   * Inserisci stringhe sentinella (caratteri speciali, sequenze con `<` e `>`) per capire se compaiono **come testo** o vengono **interpretate**.
+   * Dimostra che le stesse stringhe, in vista admin, vengono mostrate **escapate** (quindi lato admin appaiono “normali”).
+
+4. **Mostra l’impatto in modo etico**
+
+   * Prepari **dati pre-popolati**: uno scontro con `.score` visibile e una manciata di commenti normali + il “commento anomalo” (precaricato nel DB in laboratorio).
+   * Apri la modale → fai vedere **l’effetto sul DOM** (non serve mostrare il contenuto del commento né il payload): evidenzia, con DevTools, il nodo `.score` che cambia al trigger della modale.
+
+5. **Spiega perché succede**
+
+   * Radice: **inserimento come HTML** + assenza di sanitizzazione/escaping in quel punto.
+   * Confronto: lato admin, rendering **con escaping** → niente interpretazione.
+
+6. **Chiudi con le difese (best practice concrete)**
+
+   * **Regola d’oro:** inserire sempre **testo**, non HTML, quando arriva da utenti (p.es. in jQuery/JS usare metodi che trattano testo; nei template mantenere auto-escaping attivo).
+   * **Sanitizzazione client e server:** librerie di sanitizzazione lato server e, se proprio devi rendere HTML, sanitizzalo in **whitelist**.
+   * **CSP efficace:** vieta `unsafe-inline`, usa `nonce` o `hash`, limita origini di script.
+   * **Template engine:** lascia l’**autoescaping ON** e usa filtro di escape nei pochi punti necessari.
+   * **Validazione input:** limita lunghezze, caratteri e tag permessi per i commenti.
+   * **Security testing**: integra esercizi su ambienti didattici (tipo applicazioni volutamente vulnerabili da laboratorio) per allenarti senza rischi.
+
+# Come raccontarlo nella relazione di tesi
+
+* **Modello di minaccia**: attore, obiettivo (alterare un elemento di interfaccia), vettore (commento), sink (inserimento HTML in modale), trigger (apertura modale).
+* **Catena causale**: input → persistenza DB → API commenti → inserimento nel DOM come HTML → interpretazione → effetto visivo.
+* **Evidenze**: screenshot del DOM prima/dopo e network panel che mostra l’API; nessun dettaglio del payload.
+* **Mitigazioni**: lista puntuale con esempi di configurazione (autoescaping, CSP, sanitizzazione, metodi di inserimento testuale, test automatizzati).
+
+Se vuoi, posso rivedere *il tuo capitolo di sicurezza* e trasformarlo in una sezione chiara “Attacco (modello) → Evidenza → Prevenzione”, mantenendo tutto etico e senza dettagli riutilizzabili in contesti non controllati.
